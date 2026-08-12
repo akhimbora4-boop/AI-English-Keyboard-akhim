@@ -49,10 +49,6 @@ class KeyboardService : InputMethodService() {
         return keyboard
     }
 
-    // -------------------------
-    // LETTER ROW
-    // -------------------------
-
     private fun addLetterRow(
         keyboard: LinearLayout,
         keys: Array<String>
@@ -81,10 +77,7 @@ class KeyboardService : InputMethodService() {
                     key.lowercase()
                 }
 
-                currentInputConnection.commitText(
-                    output,
-                    1
-                )
+                currentInputConnection.commitText(output, 1)
 
                 if (isShiftOn) {
                     isShiftOn = false
@@ -98,10 +91,6 @@ class KeyboardService : InputMethodService() {
         keyboard.addView(row)
     }
 
-    // -------------------------
-    // Z X C V B N M + SHIFT + BACKSPACE
-    // -------------------------
-
     private fun addBottomLetterRow(
         keyboard: LinearLayout
     ) {
@@ -110,8 +99,6 @@ class KeyboardService : InputMethodService() {
 
         row.orientation = LinearLayout.HORIZONTAL
         row.gravity = Gravity.CENTER
-
-        // SHIFT
 
         val shift = createButton("⇧")
 
@@ -123,8 +110,6 @@ class KeyboardService : InputMethodService() {
         }
 
         row.addView(shift)
-
-        // LETTERS
 
         val letters = arrayOf(
             "Z", "X", "C", "V",
@@ -149,10 +134,7 @@ class KeyboardService : InputMethodService() {
                     key.lowercase()
                 }
 
-                currentInputConnection.commitText(
-                    output,
-                    1
-                )
+                currentInputConnection.commitText(output, 1)
 
                 if (isShiftOn) {
                     isShiftOn = false
@@ -162,8 +144,6 @@ class KeyboardService : InputMethodService() {
 
             row.addView(button)
         }
-
-        // BACKSPACE
 
         val backspace = createButton("⌫")
 
@@ -179,10 +159,6 @@ class KeyboardService : InputMethodService() {
 
         keyboard.addView(row)
     }
-
-    // -------------------------
-    // NUMBER & SYMBOL ROWS
-    // -------------------------
 
     private fun addNumberRows(
         keyboard: LinearLayout
@@ -207,8 +183,9 @@ class KeyboardService : InputMethodService() {
         addSymbolRow(
             keyboard,
             arrayOf(
-                "!", "\"", "'", ":", ";",
-                "?", "/", ".", ","
+                "!", "\"", "'", ":",
+                ";", "?", "/", ".",
+                ","
             )
         )
     }
@@ -241,10 +218,6 @@ class KeyboardService : InputMethodService() {
         keyboard.addView(row)
     }
 
-    // -------------------------
-    // CONTROL ROW
-    // -------------------------
-
     private fun addControlRow(
         keyboard: LinearLayout
     ) {
@@ -255,22 +228,20 @@ class KeyboardService : InputMethodService() {
         row.gravity = Gravity.CENTER
 
         // EMOJI
-
         val emoji = createButton("😀")
 
         emoji.setOnClickListener {
 
             setInputView(
-                EmojiView(
-                    this
-                )
+                EmojiView(this) {
+                    refreshKeyboard()
+                }
             )
         }
 
         row.addView(emoji)
 
-        // NUMBER / ABC
-
+        // 123 / ABC
         val modeButton = createButton(
             if (isNumberMode) {
                 "ABC"
@@ -289,7 +260,6 @@ class KeyboardService : InputMethodService() {
         row.addView(modeButton)
 
         // SPACE
-
         val space = createButton("Space")
 
         space.layoutParams = LinearLayout.LayoutParams(
@@ -309,7 +279,6 @@ class KeyboardService : InputMethodService() {
         row.addView(space)
 
         // ENTER
-
         val enter = createButton("↵")
 
         enter.setOnClickListener {
@@ -324,10 +293,6 @@ class KeyboardService : InputMethodService() {
 
         keyboard.addView(row)
     }
-
-    // -------------------------
-    // CREATE BUTTON
-    // -------------------------
 
     private fun createButton(
         text: String
@@ -349,20 +314,12 @@ class KeyboardService : InputMethodService() {
         return button
     }
 
-    // -------------------------
-    // REFRESH KEYBOARD
-    // -------------------------
-
     private fun refreshKeyboard() {
 
         setInputView(
             onCreateInputView()
         )
     }
-
-    // -------------------------
-    // DP
-    // -------------------------
 
     private fun Int.dp(): Int {
 
