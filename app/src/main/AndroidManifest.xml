@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
@@ -6,6 +7,7 @@
         android:label="AI English Keyboard"
         android:supportsRtl="true">
 
+        <!-- Keyboard Service -->
         <service
             android:name=".KeyboardService"
             android:label="AI English Keyboard"
@@ -21,6 +23,12 @@
                 android:resource="@xml/method" />
 
         </service>
+
+        <!-- Keyboard Settings -->
+        <activity
+            android:name=".KeyboardSettingsActivity"
+            android:label="Keyboard Settings"
+            android:exported="true" />
 
     </application>
 
