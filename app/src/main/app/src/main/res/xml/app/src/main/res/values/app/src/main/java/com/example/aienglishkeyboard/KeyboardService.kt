@@ -15,20 +15,30 @@ class KeyboardService : InputMethodService() {
     override fun onCreateInputView(): View {
 
         val keyboard = LinearLayout(this)
+
         keyboard.orientation = LinearLayout.VERTICAL
         keyboard.setPadding(4, 4, 4, 4)
 
         if (isNumberMode) {
+
             addNumberRows(keyboard)
+
         } else {
+
             addLetterRow(
                 keyboard,
-                arrayOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P")
+                arrayOf(
+                    "Q", "W", "E", "R", "T",
+                    "Y", "U", "I", "O", "P"
+                )
             )
 
             addLetterRow(
                 keyboard,
-                arrayOf("A", "S", "D", "F", "G", "H", "J", "K", "L")
+                arrayOf(
+                    "A", "S", "D", "F", "G",
+                    "H", "J", "K", "L"
+                )
             )
 
             addBottomLetterRow(keyboard)
@@ -39,22 +49,42 @@ class KeyboardService : InputMethodService() {
         return keyboard
     }
 
+    // -------------------------
+    // LETTER ROW
+    // -------------------------
+
     private fun addLetterRow(
         keyboard: LinearLayout,
         keys: Array<String>
     ) {
+
         val row = LinearLayout(this)
+
         row.orientation = LinearLayout.HORIZONTAL
         row.gravity = Gravity.CENTER
 
         for (key in keys) {
-            val button = createButton(
-                if (isShiftOn) key else key.lowercase()
-            )
+
+            val text = if (isShiftOn) {
+                key
+            } else {
+                key.lowercase()
+            }
+
+            val button = createButton(text)
 
             button.setOnClickListener {
-                val text = if (isShiftOn) key else key.lowercase()
-                currentInputConnection.commitText(text, 1)
+
+                val output = if (isShiftOn) {
+                    key
+                } else {
+                    key.lowercase()
+                }
+
+                currentInputConnection.commitText(
+                    output,
+                    1
+                )
 
                 if (isShiftOn) {
                     isShiftOn = false
@@ -68,32 +98,61 @@ class KeyboardService : InputMethodService() {
         keyboard.addView(row)
     }
 
+    // -------------------------
+    // Z X C V B N M + SHIFT + BACKSPACE
+    // -------------------------
+
     private fun addBottomLetterRow(
         keyboard: LinearLayout
     ) {
+
         val row = LinearLayout(this)
+
         row.orientation = LinearLayout.HORIZONTAL
         row.gravity = Gravity.CENTER
+
+        // SHIFT
 
         val shift = createButton("⇧")
 
         shift.setOnClickListener {
+
             isShiftOn = !isShiftOn
+
             refreshKeyboard()
         }
 
         row.addView(shift)
 
-        val letters = arrayOf("Z", "X", "C", "V", "B", "N", "M")
+        // LETTERS
+
+        val letters = arrayOf(
+            "Z", "X", "C", "V",
+            "B", "N", "M"
+        )
 
         for (key in letters) {
-            val button = createButton(
-                if (isShiftOn) key else key.lowercase()
-            )
+
+            val text = if (isShiftOn) {
+                key
+            } else {
+                key.lowercase()
+            }
+
+            val button = createButton(text)
 
             button.setOnClickListener {
-                val text = if (isShiftOn) key else key.lowercase()
-                currentInputConnection.commitText(text, 1)
+
+                val output = if (isShiftOn) {
+                    key
+                } else {
+                    key.lowercase()
+                }
+
+                currentInputConnection.commitText(
+                    output,
+                    1
+                )
 
                 if (isShiftOn) {
                     isShiftOn = false
@@ -104,10 +163,16 @@ class KeyboardService : InputMethodService() {
             row.addView(button)
         }
 
+        // BACKSPACE
+
         val backspace = createButton("⌫")
 
         backspace.setOnClickListener {
-            currentInputConnection.deleteSurroundingText(1, 0)
+
+            currentInputConnection.deleteSurroundingText(
+                1,
+                0
+            )
         }
 
         row.addView(backspace)
@@ -115,22 +180,36 @@ class KeyboardService : InputMethodService() {
         keyboard.addView(row)
     }
 
+    // -------------------------
+    // NUMBER & SYMBOL ROWS
+    // -------------------------
+
     private fun addNumberRows(
         keyboard: LinearLayout
     ) {
+
         addSymbolRow(
             keyboard,
-            arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
+            arrayOf(
+                "1", "2", "3", "4", "5",
+                "6", "7", "8", "9", "0"
+            )
         )
 
         addSymbolRow(
             keyboard,
-            arrayOf("@", "#", "$", "%", "&", "*", "-", "+", "(", ")")
+            arrayOf(
+                "@", "#", "$", "%", "&",
+                "*", "-", "+", "(", ")"
+            )
         )
 
         addSymbolRow(
             keyboard,
-            arrayOf("!", "\"", "'", ":", ";", "?", "/", ".", ",")
+            arrayOf(
+                "!", "\"", "'", ":", ";",
+                "?", "/", ".", ","
+            )
         )
     }
 
@@ -138,15 +217,22 @@ class KeyboardService : InputMethodService() {
         keyboard: LinearLayout,
         keys: Array<String>
     ) {
+
         val row = LinearLayout(this)
+
         row.orientation = LinearLayout.HORIZONTAL
         row.gravity = Gravity.CENTER
 
         for (key in keys) {
+
             val button = createButton(key)
 
             button.setOnClickListener {
-                currentInputConnection.commitText(key, 1)
+
+                currentInputConnection.commitText(
+                    key,
+                    1
+                )
             }
 
             row.addView(button)
@@ -155,26 +241,55 @@ class KeyboardService : InputMethodService() {
         keyboard.addView(row)
     }
 
+    // -------------------------
+    // CONTROL ROW
+    // -------------------------
+
     private fun addControlRow(
         keyboard: LinearLayout
     ) {
+
         val row = LinearLayout(this)
+
         row.orientation = LinearLayout.HORIZONTAL
         row.gravity = Gravity.CENTER
 
-        // 123 / ABC
+        // EMOJI
+
+        val emoji = createButton("😀")
+
+        emoji.setOnClickListener {
+
+            setInputView(
+                EmojiView(
+                    this
+                )
+            )
+        }
+
+        row.addView(emoji)
+
+        // NUMBER / ABC
+
         val modeButton = createButton(
-            if (isNumberMode) "ABC" else "123"
+            if (isNumberMode) {
+                "ABC"
+            } else {
+                "123"
+            }
         )
 
         modeButton.setOnClickListener {
+
             isNumberMode = !isNumberMode
+
             refreshKeyboard()
         }
 
         row.addView(modeButton)
 
-        // Space
+        // SPACE
+
         val space = createButton("Space")
 
         space.layoutParams = LinearLayout.LayoutParams(
@@ -184,16 +299,25 @@ class KeyboardService : InputMethodService() {
         )
 
         space.setOnClickListener {
-            currentInputConnection.commitText(" ", 1)
+
+            currentInputConnection.commitText(
+                " ",
+                1
+            )
         }
 
         row.addView(space)
 
-        // Enter
+        // ENTER
+
         val enter = createButton("↵")
 
         enter.setOnClickListener {
-            currentInputConnection.commitText("\n", 1)
+
+            currentInputConnection.commitText(
+                "\n",
+                1
+            )
         }
 
         row.addView(enter)
@@ -201,29 +325,50 @@ class KeyboardService : InputMethodService() {
         keyboard.addView(row)
     }
 
+    // -------------------------
+    // CREATE BUTTON
+    // -------------------------
+
     private fun createButton(
         text: String
     ): Button {
+
         val button = Button(this)
 
         button.text = text
         button.textSize = 17f
         button.setTextColor(Color.BLACK)
 
-        button.layoutParams = LinearLayout.LayoutParams(
-            0,
-            55.dp(),
-            1f
-        )
+        button.layoutParams =
+            LinearLayout.LayoutParams(
+                0,
+                55.dp(),
+                1f
+            )
 
         return button
     }
 
+    // -------------------------
+    // REFRESH KEYBOARD
+    // -------------------------
+
     private fun refreshKeyboard() {
-        setInputView(onCreateInputView())
+
+        setInputView(
+            onCreateInputView()
+        )
     }
 
+    // -------------------------
+    // DP
+    // -------------------------
+
     private fun Int.dp(): Int {
-        return (this * resources.displayMetrics.density).toInt()
+
+        return (
+            this *
+            resources.displayMetrics.density
+        ).toInt()
     }
 }
