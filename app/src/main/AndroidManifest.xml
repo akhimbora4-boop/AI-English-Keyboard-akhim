@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"
         android:label="AI English Keyboard"
         android:supportsRtl="true">
 
-        <!-- Keyboard Service -->
         <service
             android:name=".KeyboardService"
             android:label="AI English Keyboard"
@@ -15,7 +15,8 @@
             android:exported="true">
 
             <intent-filter>
-                <action android:name="android.view.InputMethod" />
+                <action
+                    android:name="android.view.InputMethod" />
             </intent-filter>
 
             <meta-data
@@ -24,7 +25,6 @@
 
         </service>
 
-        <!-- Keyboard Settings -->
         <activity
             android:name=".KeyboardSettingsActivity"
             android:label="Keyboard Settings"
