@@ -5,12 +5,12 @@ import android.view.Gravity
 import android.widget.Button
 import android.widget.LinearLayout
 
-class SuggestionView(
+class SentenceSuggestionView(
     private val service: KeyboardService
 ) : LinearLayout(service) {
 
-    private val buttons =
-        ArrayList<Button>()
+    private val suggestionButton =
+        Button(service)
 
     init {
 
@@ -21,69 +21,55 @@ class SuggestionView(
             Gravity.CENTER
 
         setPadding(
+            4.dp(),
             2.dp(),
-            2.dp(),
-            2.dp(),
+            4.dp(),
             2.dp()
         )
 
-        repeat(3) {
+        suggestionButton.text =
+            ""
 
-            val button =
-                Button(service)
+        suggestionButton.textSize =
+            14f
 
-            button.text =
-                ""
+        suggestionButton.typeface =
+            Typeface.DEFAULT
 
-            button.textSize =
-                14f
+        suggestionButton.layoutParams =
+            LinearLayout.LayoutParams(
+                0,
+                48.dp(),
+                1f
+            )
 
-            button.typeface =
-                Typeface.DEFAULT
+        suggestionButton.setOnClickListener {
 
-            button.layoutParams =
-                LinearLayout.LayoutParams(
-                    0,
-                    45.dp(),
-                    1f
-                )
+            val text =
+                suggestionButton
+                    .text
+                    .toString()
 
-            button.setOnClickListener {
+            if (text.isNotEmpty()) {
 
-                val text =
-                    button.text.toString()
-
-                if (text.isNotEmpty()) {
-
-                    service.useSuggestion(
+                service
+                    .useSentenceSuggestion(
                         text
                     )
-                }
             }
-
-            buttons.add(button)
-
-            addView(button)
         }
+
+        addView(
+            suggestionButton
+        )
     }
 
-    fun showSuggestions(
-        suggestions: List<String>
+    fun showSuggestion(
+        suggestion: String
     ) {
 
-        for (i in buttons.indices) {
-
-            if (i < suggestions.size) {
-
-                buttons[i].text =
-                    suggestions[i]
-
-            } else {
-
-                buttons[i].text =
-                    ""
-            }
-        }
+        suggestionButton.text =
+            suggestion
     }
 
     private fun Int.dp(): Int {
