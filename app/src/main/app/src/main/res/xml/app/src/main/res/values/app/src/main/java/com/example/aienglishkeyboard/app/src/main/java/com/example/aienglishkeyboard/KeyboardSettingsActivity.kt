@@ -9,21 +9,32 @@ import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
 
-class KeyboardSettingsActivity : Activity() {
+class KeyboardSettingsActivity :
+    Activity() {
 
-    private val prefsName = "keyboard_settings"
+    private val prefsName =
+        "keyboard_settings"
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
 
-        val prefs = getSharedPreferences(
-            prefsName,
-            MODE_PRIVATE
+        super.onCreate(
+            savedInstanceState
         )
 
-        val layout = LinearLayout(this)
+        val prefs =
+            getSharedPreferences(
+                prefsName,
+                MODE_PRIVATE
+            )
 
-        layout.orientation = LinearLayout.VERTICAL
+        val layout =
+            LinearLayout(this)
+
+        layout.orientation =
+            LinearLayout.VERTICAL
+
         layout.setPadding(
             24,
             24,
@@ -33,11 +44,17 @@ class KeyboardSettingsActivity : Activity() {
 
         // TITLE
 
-        val title = TextView(this)
+        val title =
+            TextView(this)
 
-        title.text = "AI English Keyboard"
-        title.textSize = 24f
-        title.gravity = Gravity.CENTER
+        title.text =
+            "AI English Keyboard"
+
+        title.textSize =
+            24f
+
+        title.gravity =
+            Gravity.CENTER
 
         layout.addView(
             title,
@@ -49,10 +66,14 @@ class KeyboardSettingsActivity : Activity() {
 
         // TYPING SOUND
 
-        val soundSwitch = Switch(this)
+        val soundSwitch =
+            Switch(this)
 
-        soundSwitch.text = "Typing Sound"
-        soundSwitch.textSize = 18f
+        soundSwitch.text =
+            "Typing Sound"
+
+        soundSwitch.textSize =
+            18f
 
         soundSwitch.isChecked =
             prefs.getBoolean(
@@ -60,7 +81,9 @@ class KeyboardSettingsActivity : Activity() {
                 true
             )
 
-        soundSwitch.setOnCheckedChangeListener { _, checked ->
+        soundSwitch.setOnCheckedChangeListener {
+                _,
+                checked ->
 
             prefs.edit()
                 .putBoolean(
@@ -80,10 +103,14 @@ class KeyboardSettingsActivity : Activity() {
 
         // FONT TITLE
 
-        val fontTitle = TextView(this)
+        val fontTitle =
+            TextView(this)
 
-        fontTitle.text = "Keyboard Font Style"
-        fontTitle.textSize = 18f
+        fontTitle.text =
+            "Keyboard Font Style"
+
+        fontTitle.textSize =
+            18f
 
         layout.addView(
             fontTitle,
@@ -95,9 +122,11 @@ class KeyboardSettingsActivity : Activity() {
 
         // NORMAL
 
-        val normal = Button(this)
+        val normal =
+            Button(this)
 
-        normal.text = "Normal"
+        normal.text =
+            "Normal"
 
         normal.setOnClickListener {
 
@@ -108,10 +137,14 @@ class KeyboardSettingsActivity : Activity() {
 
         // BOLD
 
-        val bold = Button(this)
+        val bold =
+            Button(this)
 
-        bold.text = "Bold"
-        bold.typeface = Typeface.DEFAULT_BOLD
+        bold.text =
+            "Bold"
+
+        bold.typeface =
+            Typeface.DEFAULT_BOLD
 
         bold.setOnClickListener {
 
@@ -122,10 +155,14 @@ class KeyboardSettingsActivity : Activity() {
 
         // SERIF
 
-        val serif = Button(this)
+        val serif =
+            Button(this)
 
-        serif.text = "Serif"
-        serif.typeface = Typeface.SERIF
+        serif.text =
+            "Serif"
+
+        serif.typeface =
+            Typeface.SERIF
 
         serif.setOnClickListener {
 
@@ -152,4 +189,4 @@ class KeyboardSettingsActivity : Activity() {
             )
             .apply()
     }
-}
+    }
