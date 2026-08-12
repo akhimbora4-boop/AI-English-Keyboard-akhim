@@ -1,11 +1,15 @@
 package com.example.aienglishkeyboard
 
-import android.content.Context
+import android.graphics.Color
+import android.inputmethodservice.InputMethodService
 import android.view.Gravity
 import android.widget.Button
 import android.widget.GridLayout
+import android.widget.LinearLayout
 
-class EmojiView(context: Context) : GridLayout(context) {
+class EmojiView(
+    private val service: InputMethodService
+) : LinearLayout(service) {
 
     private val emojis = arrayOf(
         "😀", "😃", "😄", "😁", "😆", "😅",
@@ -13,40 +17,109 @@ class EmojiView(context: Context) : GridLayout(context) {
         "😉", "😌", "😍", "🥰", "😘", "😎",
         "🤔", "😐", "😑", "😶", "🙄", "😏",
         "😢", "😭", "😡", "🤬", "👍", "👎",
-        "👏", "🙏", "❤️", "🔥", "🎉", "⭐"
+        "👏", "🙏", "❤️", "🔥", "🎉", "⭐",
+        "💯", "✨", "💔", "❤️‍🔥", "🥳", "🤩",
+        "😴", "🤗", "😋", "😜", "🤭", "🫡"
     )
 
     init {
-        columnCount = 6
-        setPadding(8, 8, 8, 8)
+
+        orientation = VERTICAL
+
+        // -------------------------
+        // ABC BUTTON
+        // -------------------------
+
+        val topRow = LinearLayout(service)
+
+        topRow.orientation = HORIZONTAL
+        topRow.gravity = Gravity.CENTER
+
+        val abcButton = Button(service)
+
+        abcButton.text = "ABC"
+        abcButton.textSize = 17f
+
+        abcButton.setOnClickListener {
+
+            service.setInputView(
+                service.onCreateInputView()
+            )
+        }
+
+        topRow.addView(
+            abcButton,
+            LinearLayout.LayoutParams(
+                80.dp(),
+                55.dp()
+            )
+        )
+
+        addView(topRow)
+
+        // -------------------------
+        // EMOJI GRID
+        // -------------------------
+
+        val grid = GridLayout(service)
+
+        grid.columnCount = 6
+
+        grid.setPadding(
+            4.dp(),
+            4.dp(),
+            4.dp(),
+            4.dp()
+        )
 
         for (emoji in emojis) {
 
-            val button = Button(context)
+            val button = Button(service)
 
             button.text = emoji
             button.textSize = 22f
+            button.setTextColor(Color.BLACK)
 
-            button.layoutParams = GridLayout.LayoutParams().apply {
-                width = 0
-                height = 60.dp()
-                columnSpec = GridLayout.spec(
+            val params =
+                GridLayout.LayoutParams()
+
+            params.width = 0
+            params.height = 60.dp()
+
+            params.columnSpec =
+                GridLayout.spec(
                     GridLayout.UNDEFINED,
                     1f
                 )
-            }
+
+            button.layoutParams = params
 
             button.setOnClickListener {
-                (context as? android.inputmethodservice.InputMethodService)
-                    ?.currentInputConnection
-                    ?.commitText(emoji, 1)
+
+                service.currentInputConnection
+                    ?.commitText(
+                        emoji,
+                        1
+                    )
             }
 
-            addView(button)
+            grid.addView(button)
         }
+
+        addView(
+            grid,
+            LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT
+            )
+        )
     }
 
     private fun Int.dp(): Int {
-        return (this * resources.displayMetrics.density).toInt()
+
+        return (
+            this *
+            service.resources.displayMetrics.density
+        ).toInt()
     }
 }
