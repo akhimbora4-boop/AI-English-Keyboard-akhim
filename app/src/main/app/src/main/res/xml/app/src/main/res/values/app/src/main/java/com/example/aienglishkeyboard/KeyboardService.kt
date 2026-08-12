@@ -2,7 +2,10 @@ package com.example.aienglishkeyboard
 
 import android.graphics.Color
 import android.inputmethodservice.InputMethodService
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -11,6 +14,11 @@ class KeyboardService : InputMethodService() {
 
     private var isShiftOn = false
     private var isNumberMode = false
+
+    private val toneGenerator = ToneGenerator(
+        AudioManager.STREAM_SYSTEM,
+        60
+    )
 
     override fun onCreateInputView(): View {
 
@@ -49,6 +57,10 @@ class KeyboardService : InputMethodService() {
         return keyboard
     }
 
+    // -------------------------
+    // LETTER ROW
+    // -------------------------
+
     private fun addLetterRow(
         keyboard: LinearLayout,
         keys: Array<String>
@@ -77,7 +89,10 @@ class KeyboardService : InputMethodService() {
                     key.lowercase()
                 }
 
-                currentInputConnection.commitText(output, 1)
+                currentInputConnection.commitText(
+                    output,
+                    1
+                )
 
                 if (isShiftOn) {
                     isShiftOn = false
@@ -90,6 +105,10 @@ class KeyboardService : InputMethodService() {
 
         keyboard.addView(row)
     }
+
+    // -------------------------
+    // BOTTOM LETTER ROW
+    // -------------------------
 
     private fun addBottomLetterRow(
         keyboard: LinearLayout
@@ -134,7 +153,10 @@ class KeyboardService : InputMethodService() {
                     key.lowercase()
                 }
 
-                currentInputConnection.commitText(output, 1)
+                currentInputConnection.commitText(
+                    output,
+                    1
+                )
 
                 if (isShiftOn) {
                     isShiftOn = false
@@ -144,6 +166,8 @@ class KeyboardService : InputMethodService() {
 
             row.addView(button)
         }
+
+        // BACKSPACE
 
         val backspace = createButton("⌫")
 
@@ -159,6 +183,10 @@ class KeyboardService : InputMethodService() {
 
         keyboard.addView(row)
     }
+
+    // -------------------------
+    // NUMBER & SYMBOLS
+    // -------------------------
 
     private fun addNumberRows(
         keyboard: LinearLayout
@@ -218,6 +246,10 @@ class KeyboardService : InputMethodService() {
         keyboard.addView(row)
     }
 
+    // -------------------------
+    // CONTROL ROW
+    // -------------------------
+
     private fun addControlRow(
         keyboard: LinearLayout
     ) {
@@ -228,6 +260,7 @@ class KeyboardService : InputMethodService() {
         row.gravity = Gravity.CENTER
 
         // EMOJI
+
         val emoji = createButton("😀")
 
         emoji.setOnClickListener {
@@ -242,6 +275,7 @@ class KeyboardService : InputMethodService() {
         row.addView(emoji)
 
         // 123 / ABC
+
         val modeButton = createButton(
             if (isNumberMode) {
                 "ABC"
@@ -260,6 +294,7 @@ class KeyboardService : InputMethodService() {
         row.addView(modeButton)
 
         // SPACE
+
         val space = createButton("Space")
 
         space.layoutParams = LinearLayout.LayoutParams(
@@ -279,6 +314,7 @@ class KeyboardService : InputMethodService() {
         row.addView(space)
 
         // ENTER
+
         val enter = createButton("↵")
 
         enter.setOnClickListener {
@@ -293,6 +329,10 @@ class KeyboardService : InputMethodService() {
 
         keyboard.addView(row)
     }
+
+    // -------------------------
+    // CREATE BUTTON + SOUND
+    // -------------------------
 
     private fun createButton(
         text: String
@@ -311,8 +351,26 @@ class KeyboardService : InputMethodService() {
                 1f
             )
 
+        // Typing sound
+        button.setOnTouchListener { _, event ->
+
+            if (event.action == MotionEvent.ACTION_DOWN) {
+
+                toneGenerator.startTone(
+                    ToneGenerator.TONE_PROP_BEEP,
+                    50
+                )
+            }
+
+            false
+        }
+
         return button
     }
+
+    // -------------------------
+    // REFRESH
+    // -------------------------
 
     private fun refreshKeyboard() {
 
@@ -321,11 +379,26 @@ class KeyboardService : InputMethodService() {
         )
     }
 
+    // -------------------------
+    // DP
+    // -------------------------
+
     private fun Int.dp(): Int {
 
         return (
             this *
             resources.displayMetrics.density
         ).toInt()
+    }
+
+    // -------------------------
+    // CLEAN UP
+    // -------------------------
+
+    override fun onDestroy() {
+
+        toneGenerator.release()
+
+        super.onDestroy()
     }
 }
