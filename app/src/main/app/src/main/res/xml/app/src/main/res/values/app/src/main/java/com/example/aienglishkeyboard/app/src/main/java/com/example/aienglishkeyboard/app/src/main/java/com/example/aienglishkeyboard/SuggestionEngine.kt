@@ -109,20 +109,27 @@ class SuggestionEngine {
         "you're"
     )
 
-    fun autoCorrect(word: String): String {
+    fun autoCorrect(
+        word: String
+    ): String {
 
-        val lower = word.lowercase()
+        val lower =
+            word.lowercase()
 
-        return corrections[lower] ?: word
+        return corrections[lower]
+            ?: word
     }
 
-    fun getSuggestions(prefix: String): List<String> {
+    fun getSuggestions(
+        prefix: String
+    ): List<String> {
 
         if (prefix.isBlank()) {
             return emptyList()
         }
 
-        val lower = prefix.lowercase()
+        val lower =
+            prefix.lowercase()
 
         return words
             .filter {
