@@ -8,7 +8,8 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 
 class EmojiView(
-    private val service: InputMethodService
+    private val service: InputMethodService,
+    private val onBackToKeyboard: () -> Unit
 ) : LinearLayout(service) {
 
     private val emojis = arrayOf(
@@ -18,18 +19,15 @@ class EmojiView(
         "🤔", "😐", "😑", "😶", "🙄", "😏",
         "😢", "😭", "😡", "🤬", "👍", "👎",
         "👏", "🙏", "❤️", "🔥", "🎉", "⭐",
-        "💯", "✨", "💔", "❤️‍🔥", "🥳", "🤩",
-        "😴", "🤗", "😋", "😜", "🤭", "🫡"
+        "💯", "✨", "💔", "🥳", "🤩", "😴",
+        "🤗", "😋", "😜", "🤭", "🫡", "❤️‍🔥"
     )
 
     init {
 
         orientation = VERTICAL
 
-        // -------------------------
-        // ABC BUTTON
-        // -------------------------
-
+        // Top row
         val topRow = LinearLayout(service)
 
         topRow.orientation = HORIZONTAL
@@ -42,9 +40,7 @@ class EmojiView(
 
         abcButton.setOnClickListener {
 
-            service.setInputView(
-                service.onCreateInputView()
-            )
+            onBackToKeyboard()
         }
 
         topRow.addView(
@@ -57,10 +53,7 @@ class EmojiView(
 
         addView(topRow)
 
-        // -------------------------
-        // EMOJI GRID
-        // -------------------------
-
+        // Emoji grid
         val grid = GridLayout(service)
 
         grid.columnCount = 6
@@ -80,8 +73,7 @@ class EmojiView(
             button.textSize = 22f
             button.setTextColor(Color.BLACK)
 
-            val params =
-                GridLayout.LayoutParams()
+            val params = GridLayout.LayoutParams()
 
             params.width = 0
             params.height = 60.dp()
