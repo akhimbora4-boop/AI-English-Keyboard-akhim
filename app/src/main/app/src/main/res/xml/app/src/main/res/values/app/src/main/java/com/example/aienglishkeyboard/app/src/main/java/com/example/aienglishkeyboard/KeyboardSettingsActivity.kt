@@ -1,49 +1,72 @@
 package com.example.aienglishkeyboard
 
 import android.app.Activity
-import android.os.Bundle
 import android.graphics.Typeface
+import android.os.Bundle
 import android.view.Gravity
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Switch
+import android.widget.TextView
 
 class KeyboardSettingsActivity : Activity() {
+
+    private val prefsName = "keyboard_settings"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val layout = LinearLayout(this)
-        layout.orientation = LinearLayout.VERTICAL
-        layout.setPadding(24, 24, 24, 24)
+        val prefs = getSharedPreferences(
+            prefsName,
+            MODE_PRIVATE
+        )
 
-        val title = Button(this)
-        title.text = "AI English Keyboard Settings"
-        title.textSize = 20f
-        title.isEnabled = false
+        val layout = LinearLayout(this)
+
+        layout.orientation = LinearLayout.VERTICAL
+        layout.setPadding(
+            24,
+            24,
+            24,
+            24
+        )
+
+        // TITLE
+
+        val title = TextView(this)
+
+        title.text = "AI English Keyboard"
+        title.textSize = 24f
+        title.gravity = Gravity.CENTER
 
         layout.addView(
             title,
             LinearLayout.LayoutParams(
                 -1,
-                60
+                70
             )
         )
 
-        // Typing sound
+        // TYPING SOUND
+
         val soundSwitch = Switch(this)
+
         soundSwitch.text = "Typing Sound"
-        soundSwitch.textSize = 17f
+        soundSwitch.textSize = 18f
 
         soundSwitch.isChecked =
-            getPreferences(MODE_PRIVATE)
-                .getBoolean("typing_sound", true)
+            prefs.getBoolean(
+                "typing_sound",
+                true
+            )
 
         soundSwitch.setOnCheckedChangeListener { _, checked ->
 
-            getPreferences(MODE_PRIVATE)
-                .edit()
-                .putBoolean("typing_sound", checked)
+            prefs.edit()
+                .putBoolean(
+                    "typing_sound",
+                    checked
+                )
                 .apply()
         }
 
@@ -55,40 +78,57 @@ class KeyboardSettingsActivity : Activity() {
             )
         )
 
-        // Font style title
-        val fontTitle = Button(this)
+        // FONT TITLE
+
+        val fontTitle = TextView(this)
+
         fontTitle.text = "Keyboard Font Style"
-        fontTitle.textSize = 17f
-        fontTitle.isEnabled = false
+        fontTitle.textSize = 18f
 
-        layout.addView(fontTitle)
+        layout.addView(
+            fontTitle,
+            LinearLayout.LayoutParams(
+                -1,
+                60
+            )
+        )
 
-        // Normal font
+        // NORMAL
+
         val normal = Button(this)
+
         normal.text = "Normal"
+
         normal.setOnClickListener {
+
             saveFont("normal")
         }
 
         layout.addView(normal)
 
-        // Bold font
+        // BOLD
+
         val bold = Button(this)
+
         bold.text = "Bold"
         bold.typeface = Typeface.DEFAULT_BOLD
 
         bold.setOnClickListener {
+
             saveFont("bold")
         }
 
         layout.addView(bold)
 
-        // Serif font
+        // SERIF
+
         val serif = Button(this)
+
         serif.text = "Serif"
         serif.typeface = Typeface.SERIF
 
         serif.setOnClickListener {
+
             saveFont("serif")
         }
 
@@ -97,11 +137,19 @@ class KeyboardSettingsActivity : Activity() {
         setContentView(layout)
     }
 
-    private fun saveFont(font: String) {
+    private fun saveFont(
+        font: String
+    ) {
 
-        getPreferences(MODE_PRIVATE)
+        getSharedPreferences(
+            prefsName,
+            MODE_PRIVATE
+        )
             .edit()
-            .putString("font_style", font)
+            .putString(
+                "font_style",
+                font
+            )
             .apply()
     }
 }
