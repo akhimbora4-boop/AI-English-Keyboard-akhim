@@ -12,31 +12,40 @@ class EmojiView(
     private val onBackToKeyboard: () -> Unit
 ) : LinearLayout(service) {
 
-    private val emojis = arrayOf(
-        "😀", "😃", "😄", "😁", "😆", "😅",
-        "😂", "🤣", "😊", "😇", "🙂", "🙃",
-        "😉", "😌", "😍", "🥰", "😘", "😎",
-        "🤔", "😐", "😑", "😶", "🙄", "😏",
-        "😢", "😭", "😡", "🤬", "👍", "👎",
-        "👏", "🙏", "❤️", "🔥", "🎉", "⭐",
-        "💯", "✨", "💔", "🥳", "🤩", "😴",
-        "🤗", "😋", "😜", "🤭", "🫡", "❤️‍🔥"
-    )
+    private val emojis =
+        arrayOf(
+            "😀", "😃", "😄", "😁", "😆", "😅",
+            "😂", "🤣", "😊", "😇", "🙂", "🙃",
+            "😉", "😌", "😍", "🥰", "😘", "😎",
+            "🤔", "😐", "😑", "😶", "🙄", "😏",
+            "😢", "😭", "😡", "🤬", "👍", "👎",
+            "👏", "🙏", "❤️", "🔥", "🎉", "⭐",
+            "💯", "✨", "💔", "🥳", "🤩", "😴",
+            "🤗", "😋", "😜", "🤭", "🫡", "❤️‍🔥"
+        )
 
     init {
 
-        orientation = VERTICAL
+        orientation =
+            VERTICAL
 
-        // Top row
-        val topRow = LinearLayout(service)
+        val topRow =
+            LinearLayout(service)
 
-        topRow.orientation = HORIZONTAL
-        topRow.gravity = Gravity.CENTER
+        topRow.orientation =
+            HORIZONTAL
 
-        val abcButton = Button(service)
+        topRow.gravity =
+            Gravity.CENTER
 
-        abcButton.text = "ABC"
-        abcButton.textSize = 17f
+        val abcButton =
+            Button(service)
+
+        abcButton.text =
+            "ABC"
+
+        abcButton.textSize =
+            17f
 
         abcButton.setOnClickListener {
 
@@ -53,10 +62,11 @@ class EmojiView(
 
         addView(topRow)
 
-        // Emoji grid
-        val grid = GridLayout(service)
+        val grid =
+            GridLayout(service)
 
-        grid.columnCount = 6
+        grid.columnCount =
+            6
 
         grid.setPadding(
             4.dp(),
@@ -67,16 +77,27 @@ class EmojiView(
 
         for (emoji in emojis) {
 
-            val button = Button(service)
+            val button =
+                Button(service)
 
-            button.text = emoji
-            button.textSize = 22f
-            button.setTextColor(Color.BLACK)
+            button.text =
+                emoji
 
-            val params = GridLayout.LayoutParams()
+            button.textSize =
+                22f
 
-            params.width = 0
-            params.height = 60.dp()
+            button.setTextColor(
+                Color.BLACK
+            )
+
+            val params =
+                GridLayout.LayoutParams()
+
+            params.width =
+                0
+
+            params.height =
+                60.dp()
 
             params.columnSpec =
                 GridLayout.spec(
@@ -84,11 +105,13 @@ class EmojiView(
                     1f
                 )
 
-            button.layoutParams = params
+            button.layoutParams =
+                params
 
             button.setOnClickListener {
 
-                service.currentInputConnection
+                service
+                    .currentInputConnection
                     ?.commitText(
                         emoji,
                         1
@@ -111,7 +134,9 @@ class EmojiView(
 
         return (
             this *
-            service.resources.displayMetrics.density
-        ).toInt()
+                service.resources
+                    .displayMetrics
+                    .density
+            ).toInt()
     }
 }
