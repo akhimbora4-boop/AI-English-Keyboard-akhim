@@ -1,6 +1,8 @@
 package com.example.aienglishkeyboard
 
+import android.content.Intent
 import android.graphics.Color
+import android.graphics.Typeface
 import android.inputmethodservice.InputMethodService
 import android.media.AudioManager
 import android.media.ToneGenerator
@@ -119,6 +121,8 @@ class KeyboardService : InputMethodService() {
         row.orientation = LinearLayout.HORIZONTAL
         row.gravity = Gravity.CENTER
 
+        // SHIFT
+
         val shift = createButton("⇧")
 
         shift.setOnClickListener {
@@ -129,6 +133,8 @@ class KeyboardService : InputMethodService() {
         }
 
         row.addView(shift)
+
+        // Z X C V B N M
 
         val letters = arrayOf(
             "Z", "X", "C", "V",
@@ -185,7 +191,7 @@ class KeyboardService : InputMethodService() {
     }
 
     // -------------------------
-    // NUMBER & SYMBOLS
+    // NUMBERS & SYMBOLS
     // -------------------------
 
     private fun addNumberRows(
@@ -212,8 +218,7 @@ class KeyboardService : InputMethodService() {
             keyboard,
             arrayOf(
                 "!", "\"", "'", ":",
-                ";", "?", "/", ".",
-                ","
+                ";", "?", "/", ".", ","
             )
         )
     }
@@ -274,6 +279,22 @@ class KeyboardService : InputMethodService() {
 
         row.addView(emoji)
 
+        // SETTINGS
+
+        val settings = createButton("⚙")
+
+        settings.setOnClickListener {
+
+            val intent = Intent(
+                this,
+                KeyboardSettingsActivity::class.java
+            )
+
+            startActivity(intent)
+        }
+
+        row.addView(settings)
+
         // 123 / ABC
 
         val modeButton = createButton(
@@ -331,7 +352,7 @@ class KeyboardService : InputMethodService() {
     }
 
     // -------------------------
-    // CREATE BUTTON + SOUND
+    // CREATE BUTTON
     // -------------------------
 
     private fun createButton(
@@ -351,10 +372,33 @@ class KeyboardService : InputMethodService() {
                 1f
             )
 
+        // Font style
+
+        val fontStyle = getSharedPreferences(
+            "keyboard_settings",
+            MODE_PRIVATE
+        ).getString(
+            "font_style",
+            "normal"
+        )
+
+        button.typeface = when (fontStyle) {
+
+            "bold" -> Typeface.DEFAULT_BOLD
+
+            "serif" -> Typeface.SERIF
+
+            else -> Typeface.DEFAULT
+        }
+
         // Typing sound
+
         button.setOnTouchListener { _, event ->
 
-            if (event.action == MotionEvent.ACTION_DOWN) {
+            if (
+                event.action == MotionEvent.ACTION_DOWN &&
+                isTypingSoundEnabled()
+            ) {
 
                 toneGenerator.startTone(
                     ToneGenerator.TONE_PROP_BEEP,
@@ -366,6 +410,21 @@ class KeyboardService : InputMethodService() {
         }
 
         return button
+    }
+
+    // -------------------------
+    // SOUND SETTING
+    // -------------------------
+
+    private fun isTypingSoundEnabled(): Boolean {
+
+        return getSharedPreferences(
+            "keyboard_settings",
+            MODE_PRIVATE
+        ).getBoolean(
+            "typing_sound",
+            true
+        )
     }
 
     // -------------------------
