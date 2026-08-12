@@ -20,19 +20,23 @@ class KeyboardService : InputMethodService() {
     private val suggestionEngine =
         SuggestionEngine()
 
+    private val sentenceEngine =
+        SentenceEngine()
+
     private var currentWord = ""
+    private var currentSentence = ""
 
     private var suggestionView:
         SuggestionView? = null
 
-    private val toneGenerator = ToneGenerator(
-        AudioManager.STREAM_SYSTEM,
-        60
-    )
+    private var sentenceSuggestionView:
+        SentenceSuggestionView? = null
 
-    // =================================
-    // CREATE KEYBOARD
-    // =================================
+    private val toneGenerator =
+        ToneGenerator(
+            AudioManager.STREAM_SYSTEM,
+            60
+        )
 
     override fun onCreateInputView(): View {
 
@@ -48,14 +52,27 @@ class KeyboardService : InputMethodService() {
             4
         )
 
-        // ---------------------------------
-        // SUGGESTION ROW
-        // ---------------------------------
+        // Sentence suggestion
+        val sentenceSuggestions =
+            SentenceSuggestionView(this)
 
+        sentenceSuggestionView =
+            sentenceSuggestions
+
+        keyboard.addView(
+            sentenceSuggestions,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                48.dp()
+            )
+        )
+
+        // Word suggestions
         val suggestions =
             SuggestionView(this)
 
-        suggestionView = suggestions
+        suggestionView =
+            suggestions
 
         keyboard.addView(
             suggestions,
@@ -65,59 +82,30 @@ class KeyboardService : InputMethodService() {
             )
         )
 
-        // ---------------------------------
-        // LETTER / NUMBER KEYBOARD
-        // ---------------------------------
-
         if (isNumberMode) {
 
             addNumberRows(keyboard)
 
         } else {
 
-            // Q W E R T Y U I O P
+            addLetterRow(
+                keyboard,
+                arrayOf(
+                    "Q", "W", "E", "R", "T",
+                    "Y", "U", "I", "O", "P"
+                )
+            )
 
             addLetterRow(
                 keyboard,
                 arrayOf(
-                    "Q",
-                    "W",
-                    "E",
-                    "R",
-                    "T",
-                    "Y",
-                    "U",
-                    "I",
-                    "O",
-                    "P"
+                    "A", "S", "D", "F", "G",
+                    "H", "J", "K", "L"
                 )
             )
-
-            // A S D F G H J K L
-
-            addLetterRow(
-                keyboard,
-                arrayOf(
-                    "A",
-                    "S",
-                    "D",
-                    "F",
-                    "G",
-                    "H",
-                    "J",
-                    "K",
-                    "L"
-                )
-            )
-
-            // SHIFT Z X C V B N M BACKSPACE
 
             addBottomLetterRow(keyboard)
         }
-
-        // ---------------------------------
-        // CONTROL ROW
-        // ---------------------------------
 
         addControlRow(keyboard)
 
@@ -169,8 +157,10 @@ class KeyboardService : InputMethodService() {
                     )
 
                 currentWord += output
+                currentSentence += output
 
                 updateSuggestions()
+                updateSentenceSuggestion()
 
                 if (isShiftOn) {
 
@@ -216,7 +206,7 @@ class KeyboardService : InputMethodService() {
 
         row.addView(shift)
 
-        // LETTERS
+        // Z X C V B N M
 
         val letters = arrayOf(
             "Z",
@@ -256,8 +246,10 @@ class KeyboardService : InputMethodService() {
                     )
 
                 currentWord += output
+                currentSentence += output
 
                 updateSuggestions()
+                updateSentenceSuggestion()
 
                 if (isShiftOn) {
 
@@ -289,7 +281,14 @@ class KeyboardService : InputMethodService() {
                     currentWord.dropLast(1)
             }
 
+            if (currentSentence.isNotEmpty()) {
+
+                currentSentence =
+                    currentSentence.dropLast(1)
+            }
+
             updateSuggestions()
+            updateSentenceSuggestion()
         }
 
         row.addView(backspace)
@@ -298,7 +297,7 @@ class KeyboardService : InputMethodService() {
     }
 
     // =================================
-    // NUMBER ROWS
+    // NUMBERS
     // =================================
 
     private fun addNumberRows(
@@ -308,54 +307,27 @@ class KeyboardService : InputMethodService() {
         addSymbolRow(
             keyboard,
             arrayOf(
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "0"
+                "1", "2", "3", "4", "5",
+                "6", "7", "8", "9", "0"
             )
         )
 
         addSymbolRow(
             keyboard,
             arrayOf(
-                "@",
-                "#",
-                "$",
-                "%",
-                "&",
-                "*",
-                "-",
-                "+",
-                "(",
-                ")"
+                "@", "#", "$", "%", "&",
+                "*", "-", "+", "(", ")"
             )
         )
 
         addSymbolRow(
             keyboard,
             arrayOf(
-                "!",
-                "\"",
-                "'",
-                ":",
-                ";",
-                "?",
-                "/",
-                ".",
-                ","
+                "!", "\"", "'", ":",
+                ";", "?", "/", ".", ","
             )
         )
     }
-
-    // =================================
-    // SYMBOL ROW
-    // =================================
 
     private fun addSymbolRow(
         keyboard: LinearLayout,
@@ -410,9 +382,7 @@ class KeyboardService : InputMethodService() {
         row.gravity =
             Gravity.CENTER
 
-        // ---------------------------------
         // EMOJI
-        // ---------------------------------
 
         val emoji =
             createButton("😀")
@@ -421,7 +391,6 @@ class KeyboardService : InputMethodService() {
 
             setInputView(
                 EmojiView(this) {
-
                     refreshKeyboard()
                 }
             )
@@ -429,9 +398,7 @@ class KeyboardService : InputMethodService() {
 
         row.addView(emoji)
 
-        // ---------------------------------
         // SETTINGS
-        // ---------------------------------
 
         val settings =
             createButton("⚙")
@@ -449,9 +416,7 @@ class KeyboardService : InputMethodService() {
 
         row.addView(settings)
 
-        // ---------------------------------
         // 123 / ABC
-        // ---------------------------------
 
         val modeButton =
             createButton(
@@ -472,9 +437,7 @@ class KeyboardService : InputMethodService() {
 
         row.addView(modeButton)
 
-        // ---------------------------------
         // SPACE
-        // ---------------------------------
 
         val space =
             createButton("Space")
@@ -498,14 +461,17 @@ class KeyboardService : InputMethodService() {
 
             currentWord = ""
 
+            if (currentSentence.isNotEmpty()) {
+                currentSentence += " "
+            }
+
             updateSuggestions()
+            updateSentenceSuggestion()
         }
 
         row.addView(space)
 
-        // ---------------------------------
         // ENTER
-        // ---------------------------------
 
         val enter =
             createButton("↵")
@@ -521,8 +487,10 @@ class KeyboardService : InputMethodService() {
                 )
 
             currentWord = ""
+            currentSentence = ""
 
             updateSuggestions()
+            updateSentenceSuggestion()
         }
 
         row.addView(enter)
@@ -541,9 +509,11 @@ class KeyboardService : InputMethodService() {
         val button =
             Button(this)
 
-        button.text = text
+        button.text =
+            text
 
-        button.textSize = 17f
+        button.textSize =
+            17f
 
         button.setTextColor(
             Color.BLACK
@@ -555,10 +525,6 @@ class KeyboardService : InputMethodService() {
                 55.dp(),
                 1f
             )
-
-        // ---------------------------------
-        // FONT STYLE
-        // ---------------------------------
 
         val fontStyle =
             getSharedPreferences(
@@ -581,10 +547,6 @@ class KeyboardService : InputMethodService() {
                 else ->
                     Typeface.DEFAULT
             }
-
-        // ---------------------------------
-        // TYPING SOUND
-        // ---------------------------------
 
         button.setOnTouchListener { _, event ->
 
@@ -617,10 +579,9 @@ class KeyboardService : InputMethodService() {
         }
 
         val corrected =
-            suggestionEngine
-                .autoCorrect(
-                    currentWord
-                )
+            suggestionEngine.autoCorrect(
+                currentWord
+            )
 
         if (corrected != currentWord) {
 
@@ -635,11 +596,23 @@ class KeyboardService : InputMethodService() {
                     corrected,
                     1
                 )
+
+            if (currentSentence.length >=
+                currentWord.length
+            ) {
+
+                currentSentence =
+                    currentSentence.dropLast(
+                        currentWord.length
+                    )
+
+                currentSentence += corrected
+            }
         }
     }
 
     // =================================
-    // UPDATE SUGGESTIONS
+    // WORD SUGGESTIONS
     // =================================
 
     private fun updateSuggestions() {
@@ -657,7 +630,32 @@ class KeyboardService : InputMethodService() {
     }
 
     // =================================
-    // USE SUGGESTION
+    // SENTENCE SUGGESTION
+    // =================================
+
+    private fun updateSentenceSuggestion() {
+
+        val suggestions =
+            sentenceEngine.suggest(
+                currentSentence
+            )
+
+        if (suggestions.isNotEmpty()) {
+
+            sentenceSuggestionView
+                ?.showSuggestion(
+                    suggestions[0]
+                )
+
+        } else {
+
+            sentenceSuggestionView
+                ?.showSuggestion("")
+        }
+    }
+
+    // =================================
+    // USE WORD SUGGESTION
     // =================================
 
     fun useSuggestion(
@@ -680,13 +678,58 @@ class KeyboardService : InputMethodService() {
                 1
             )
 
+        if (currentSentence.length >=
+            currentWord.length
+        ) {
+
+            currentSentence =
+                currentSentence.dropLast(
+                    currentWord.length
+                )
+
+            currentSentence +=
+                suggestion + " "
+        }
+
         currentWord = ""
 
         updateSuggestions()
+        updateSentenceSuggestion()
     }
 
     // =================================
-    // TYPING SOUND SETTING
+    // USE SENTENCE SUGGESTION
+    // =================================
+
+    fun useSentenceSuggestion(
+        suggestion: String
+    ) {
+
+        if (currentSentence.isEmpty()) {
+            return
+        }
+
+        currentInputConnection
+            ?.deleteSurroundingText(
+                currentSentence.length,
+                0
+            )
+
+        currentInputConnection
+            ?.commitText(
+                suggestion + " ",
+                1
+            )
+
+        currentSentence = ""
+        currentWord = ""
+
+        updateSuggestions()
+        updateSentenceSuggestion()
+    }
+
+    // =================================
+    // SOUND
     // =================================
 
     private fun isTypingSoundEnabled():
@@ -702,7 +745,7 @@ class KeyboardService : InputMethodService() {
     }
 
     // =================================
-    // REFRESH KEYBOARD
+    // REFRESH
     // =================================
 
     private fun refreshKeyboard() {
@@ -727,7 +770,7 @@ class KeyboardService : InputMethodService() {
     }
 
     // =================================
-    // CLEAN UP
+    // DESTROY
     // =================================
 
     override fun onDestroy() {
